@@ -1,1 +1,1 @@
-QUETIONS = ["Who are you?", "How old are you?"]
+QUETIONS = ["Who are you?", "How old are you?", "Whats your name?"]
