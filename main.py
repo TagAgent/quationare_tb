@@ -20,5 +20,9 @@ def ask_quetion(message):
         bot.send_message(message.chat.id, QUETIONS[item])
         answers.append(message.text)
         print(answers)
+    send_answers_to_author()
+
+def send_answers_to_author():
+    bot.send_message(AUTHOR_CHATID, str(answers))
 
 bot.infinity_polling()
