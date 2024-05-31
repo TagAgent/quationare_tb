@@ -23,7 +23,7 @@ def send_quetion(message):
     for item in chats:
         if chats[item] >= len(QUETIONS):
             bot.send_message(message.chat.id, "Вы ответили на все вопросы! Ваши ответы отправленны автору этого бота!")
-            send_to_author()
+            send_to_author(message)
             break
 
         if message.chat.id == item:
@@ -37,8 +37,8 @@ def add_answer(message):
     answers.append(message.text)
     send_quetion(message)
 
-def send_to_author():
+def send_to_author(message):
     answers_text = str(answers)
-    bot.send_message(AUTHOR_CHATID, answers_text[1:len(answers_text)-1])
+    bot.send_message(AUTHOR_CHATID, f"Ответы на вопросы от пользователя {message.from_user.first_name}: {answers_text[1:len(answers_text)-1]}")
 
 bot.infinity_polling()
