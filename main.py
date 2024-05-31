@@ -6,31 +6,39 @@ from local_settings import AUTHOR_CHATID
 bot = telebot.TeleBot(API_TOKEN)
 
 answers = []
-last_answer = ""
+chats = {}
 
 @bot.message_handler(commands=['start'])
 def send_welcome(message):
     bot.reply_to(message, f"""
 Здраствуйте, это бот-опросник 
-Когда вы ответите на все вопросы все ваши ответы будут отправленны создателю этого бота 
-{QUETIONS[0]}""")
+Когда вы ответите на все вопросы все ваши ответы будут отправленны создателю этого бота """)
+    send_quetion(message)
 
 @bot.message_handler(func=lambda message: True)
-def ask_quetion(message):
-    for index in range(1, len(QUETIONS)):
-        send_quetion(message, index)
-        last_answer = message.text
+def send_quetion(message):
+    if message.chat.id not in chats:
+        chats[message.chat.id] = 0
 
-    print(answers)
-    send_answers_to_author()
+    for item in chats:
+        if chats[item] >= len(QUETIONS):
+            bot.send_message(message.chat.id, "Вы ответили на все вопросы! Ваши ответы отправленны автору этого бота!")
+            send_to_author()
+            break
 
-def send_quetion(message, index: int):
-    if message.text != last_answer:
-        msg = bot.send_message(message.chat.id, QUETIONS[index])
-        bot.register_next_step_handler(msg, message.text)
-        answers.append(message.text)
+        if message.chat.id == item:
+            bot_message = bot.send_message(message.chat.id, QUETIONS[chats[item]])
+            chats[item] += 1
+            bot.register_next_step_handler(bot_message, add_answer)
+            break
 
-def send_answers_to_author():
-    bot.send_message(AUTHOR_CHATID, str(answers))
+
+def add_answer(message):
+    answers.append(message.text)
+    send_quetion(message)
+
+def send_to_author():
+    answers_text = str(answers)
+    bot.send_message(AUTHOR_CHATID, answers_text[1:len(answers_text)-1])
 
 bot.infinity_polling()
